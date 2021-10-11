@@ -1,4 +1,4 @@
-module github.com/boynux/squid-exporter
+module github.com/maxwheel/squid-exporter
 
 go 1.13
 

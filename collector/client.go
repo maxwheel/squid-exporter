@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/boynux/squid-exporter/types"
+	"github.com/maxwheel/squid-exporter/types"
 	proxyproto "github.com/pires/go-proxyproto"
 )
 

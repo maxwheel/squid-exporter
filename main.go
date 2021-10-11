@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/boynux/squid-exporter/collector"
-	"github.com/boynux/squid-exporter/config"
+	"github.com/maxwheel/squid-exporter/collector"
+	"github.com/maxwheel/squid-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/version"
