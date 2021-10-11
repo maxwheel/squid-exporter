@@ -116,7 +116,7 @@ FAQ:
   http_port 3128 require-proxy-header
   proxy_protocol_access allow localnet
   ```
-  please run with config `-with-proxy-protocal`. It could be happened when enable Squid in AWS cloud behind NLB.
+  please run with config `-with-proxy-protocol`. It could be happened when enable Squid in AWS cloud behind NLB.
   
 Contribution:
 -------------

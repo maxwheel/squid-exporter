@@ -52,7 +52,7 @@ type Config struct {
 	Password      string
 	Pidfile       string
 
-	WithProxyProtocal bool
+	WithProxyProtocol bool
 }
 
 /*NewConfig creates a new config object from command line args */
@@ -66,7 +66,7 @@ func NewConfig() *Config {
 
 	flag.BoolVar(&c.ExtractServiceTimes, "extractservicetimes",
 		loadEnvBoolVar(squidExtractServiceTimes, defaultExtractServiceTimes), "Extract service times metrics")
-	flag.BoolVar(&c.WithProxyProtocal, "with-proxy-protocal", false, "Enable Proxy protocal")
+	flag.BoolVar(&c.WithProxyProtocol, "with-proxy-protocol", false, "Enable Proxy protocol")
 
 	flag.Var(&c.Labels, "label", "Custom metrics to attach to metrics, use -label multiple times for each additional label")
 

@@ -22,7 +22,7 @@ type CacheObjectClient struct {
 	port              int
 	basicAuthString   string
 	headers           map[string]string
-	withProxyProtocal bool
+	withProxyProtocol bool
 }
 
 /*SquidClient provides functionality to fetch squid metrics */
@@ -44,24 +44,24 @@ func buildBasicAuthString(login string, password string) string {
 }
 
 /*NewCacheObjectClient initializes a new cache client */
-func NewCacheObjectClient(hostname string, port int, login string, password string, withProxyProtocal bool) *CacheObjectClient {
+func NewCacheObjectClient(hostname string, port int, login string, password string, withProxyProtocol bool) *CacheObjectClient {
 	return &CacheObjectClient{
 		hostname,
 		port,
 		buildBasicAuthString(login, password),
 		map[string]string{},
-		withProxyProtocal,
+		withProxyProtocol,
 	}
 }
 
-func readFromSquid(hostname string, port int, basicAuthString string, endpoint string, withProxyProtocal bool) (*bufio.Reader, error) {
+func readFromSquid(hostname string, port int, basicAuthString string, endpoint string, withProxyProtocol bool) (*bufio.Reader, error) {
 	conn, err := connect(hostname, port)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if withProxyProtocal {
+	if withProxyProtocol {
 		// set proxy proto header (version 1)
 		// from: localhost:80
 		// to: localhost: <port>
@@ -121,7 +121,7 @@ func readLines(reader *bufio.Reader, lines chan<- string) {
 func (c *CacheObjectClient) GetCounters() (types.Counters, error) {
 	var counters types.Counters
 
-	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "counters", c.withProxyProtocal)
+	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "counters", c.withProxyProtocol)
 	if err != nil {
 		return nil, fmt.Errorf("error getting counters: %v", err)
 	}
@@ -145,7 +145,7 @@ func (c *CacheObjectClient) GetCounters() (types.Counters, error) {
 func (c *CacheObjectClient) GetServiceTimes() (types.Counters, error) {
 	var serviceTimes types.Counters
 
-	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "service_times", c.withProxyProtocal)
+	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "service_times", c.withProxyProtocol)
 	if err != nil {
 		return nil, fmt.Errorf("error getting service times: %v", err)
 	}
