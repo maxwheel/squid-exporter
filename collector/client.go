@@ -5,21 +5,24 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/boynux/squid-exporter/types"
 	"io"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/boynux/squid-exporter/types"
+	proxyproto "github.com/pires/go-proxyproto"
 )
 
 /*CacheObjectClient holds information about squid manager */
 type CacheObjectClient struct {
-	hostname        string
-	port            int
-	basicAuthString string
-	headers         map[string]string
+	hostname          string
+	port              int
+	basicAuthString   string
+	headers           map[string]string
+	withProxyProtocal bool
 }
 
 /*SquidClient provides functionality to fetch squid metrics */
@@ -41,20 +44,47 @@ func buildBasicAuthString(login string, password string) string {
 }
 
 /*NewCacheObjectClient initializes a new cache client */
-func NewCacheObjectClient(hostname string, port int, login string, password string) *CacheObjectClient {
+func NewCacheObjectClient(hostname string, port int, login string, password string, withProxyProtocal bool) *CacheObjectClient {
 	return &CacheObjectClient{
 		hostname,
 		port,
 		buildBasicAuthString(login, password),
 		map[string]string{},
+		withProxyProtocal,
 	}
 }
 
-func readFromSquid(hostname string, port int, basicAuthString string, endpoint string) (*bufio.Reader, error) {
+func readFromSquid(hostname string, port int, basicAuthString string, endpoint string, withProxyProtocal bool) (*bufio.Reader, error) {
 	conn, err := connect(hostname, port)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if withProxyProtocal {
+		// set proxy proto header (version 1)
+		// from: localhost:80
+		// to: localhost: <port>
+		header := &proxyproto.Header{
+			Version:           1,
+			Command:           proxyproto.PROXY,
+			TransportProtocol: proxyproto.TCPv4,
+			SourceAddr: &net.TCPAddr{
+				IP:   net.ParseIP("127.0.0.1"),
+				Port: 80,
+			},
+
+			DestinationAddr: &net.TCPAddr{
+				IP:   net.ParseIP("127.0.0.1"),
+				Port: port,
+			},
+		}
+		// After the connection was created write the proxy headers first
+		_, err = header.WriteTo(conn)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	r, err := get(conn, endpoint, basicAuthString)
@@ -91,7 +121,7 @@ func readLines(reader *bufio.Reader, lines chan<- string) {
 func (c *CacheObjectClient) GetCounters() (types.Counters, error) {
 	var counters types.Counters
 
-	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "counters")
+	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "counters", c.withProxyProtocal)
 	if err != nil {
 		return nil, fmt.Errorf("error getting counters: %v", err)
 	}
@@ -115,7 +145,7 @@ func (c *CacheObjectClient) GetCounters() (types.Counters, error) {
 func (c *CacheObjectClient) GetServiceTimes() (types.Counters, error) {
 	var serviceTimes types.Counters
 
-	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "service_times")
+	reader, err := readFromSquid(c.hostname, c.port, c.basicAuthString, "service_times", c.withProxyProtocal)
 	if err != nil {
 		return nil, fmt.Errorf("error getting service times: %v", err)
 	}

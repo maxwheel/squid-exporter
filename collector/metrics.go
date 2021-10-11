@@ -33,12 +33,12 @@ type Exporter struct {
 }
 
 /*New initializes a new exporter */
-func New(hostname string, port int, login string, password string, labels config.Labels) *Exporter {
+func New(hostname string, port int, login string, password string, labels config.Labels, withProxyProtocal bool) *Exporter {
 	counters = generateSquidCounters(labels.Keys)
 	if ExtractServiceTimes {
 		serviceTimes = generateSquidServiceTimes(labels.Keys)
 	}
-	c := NewCacheObjectClient(hostname, port, login, password)
+	c := NewCacheObjectClient(hostname, port, login, password, withProxyProtocal)
 
 	return &Exporter{
 		c,

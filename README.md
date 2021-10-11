@@ -1,18 +1,13 @@
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/boynux/squid-exporter)
-
-[![Build Status](https://travis-ci.org/boynux/squid-exporter.svg?branch=master)](https://travis-ci.org/boynux/squid-exporter)
-[![Go Report Card](https://goreportcard.com/badge/github.com/boynux/squid-exporter)](https://goreportcard.com/report/github.com/boynux/squid-exporter)
-[![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/boynux/squid-exporter)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3TH7YAMMEC5L4&source=url)
-
-
 
 Squid Prometheus exporter
+
 --------------------------
 
 Exports squid metrics in Prometheus format
 
 **NOTE**: From release 1.0 metric names and some parameters has changed. Make sure you check the docs and update your deployments accordingly!
+
+**Fork from** [https://github.com/boynux/squid-exporter]@2021/10/11
 
 New
 -----
@@ -26,7 +21,7 @@ Simple usage:
 
     squid-exporter -squid-hostname "localhost" -squid-port 3128
 
-[Configure Prometheus](https://github.com/boynux/squid-exporter/blob/master/prometheus/prometheus.yml) to scrape metrics from `localhost:9301/metrics`
+[Configure Prometheus](https://github.com/maxwheel/squid-exporter/blob/master/prometheus/prometheus.yml) to scrape metrics from `localhost:9301/metrics`
 
     - job_name: squid
       # squid-exporter is installed, grab stats about the local
@@ -54,15 +49,15 @@ Usage with docker:
 ------
 Basic setup assuming Squid is running on the same machine:
 
-    docker run --net=host -d boynux/squid-exporter
+    docker run --net=host -d maxwheel/squid-exporter
 
 Setup with Squid running on a different host
 
-    docker run -p 9301:9301 -d boynux/squid-exporter -squid-hostname "192.168.0.2" -squid-port 3128 -listen ":9301"
+    docker run -p 9301:9301 -d maxwheel/squid-exporter -squid-hostname "192.168.0.2" -squid-port 3128 -listen ":9301"
 
 With environment variables
 
-    docker run -p 9301:9301 -d -e SQUID_PORT="3128" -e SQUID_HOSTNAME="192.168.0.2" -e SQUID_EXPORTER_LISTEN=":9301" boynux/squid-exporter
+    docker run -p 9301:9301 -d -e SQUID_PORT="3128" -e SQUID_HOSTNAME="192.168.0.2" -e SQUID_EXPORTER_LISTEN=":9301" maxwheel/squid-exporter
 
 
 Build:
@@ -70,11 +65,11 @@ Build:
 
 This project is written in Go, so all the usual methods for building (or cross compiling) a Go application would work.
 
-If you are not very familiar with Go you can download the binary from [releases](https://github.com/boynux/squid-exporter/releases).
+If you are not very familiar with Go you can download the binary from [releases](https://github.com/maxwheel/squid-exporter/releases).
 
 Or build it for your OS:
 
-`go install https://github.com/boynux/squid-exporter`
+`go install https://github.com/maxwheel/squid-exporter`
 
 then you can find the binary in: `$GOPATH/bin/squid-exporter`
 
@@ -116,6 +111,12 @@ FAQ:
   acl prometheus src 172.20.0.0/16
   http_access allow manager prometheus
   ```
+  - If you have enabled `require-proxy-header` in squid, such as
+  ```
+  http_port 3128 require-proxy-header
+  proxy_protocol_access allow localnet
+  ```
+  please run with config `-with-proxy-protocal`. It could be happened when enable Squid in AWS cloud behind NLB.
   
 Contribution:
 -------------
